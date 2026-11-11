@@ -117,3 +117,4 @@ The team collaborated on application planning, design decisions, implementation,
 ## AI usage
 
 During development, the team used ChatGPT and Gemini for support with HTML, CSS, JavaScript, and Node.js concepts; brainstorming; troubleshooting; and reviewing possible improvements. Team members evaluated, adapted, and tested suggestions as part of their work. Refer to the linked AI Use Statement for the team's fuller disclosure.
+
