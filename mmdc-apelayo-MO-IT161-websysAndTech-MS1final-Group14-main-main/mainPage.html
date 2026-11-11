@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="en">
+
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+    <title>To-Do List</title>
+
+
+    <!-- External CSS -->
+    <link rel="stylesheet" href="style.css">
+</head>
+
+
+<body>
+
+
+    <!-- ===== MAIN APPLICATION ===== -->
+    <div class="app">
+
+
+
+
+        <!-- ===== SIDEBAR ===== -->
+        <aside class="sidebar" id="sidebar">
+
+
+            <!-- Logo / Title -->
+            <div class="sidebar-header">
+
+
+                <div class="logo">✓</div>
+                <span>To-Do List</span>
+
+
+            </div>
+
+
+            <!-- Categories -->
+            <nav class="categories" aria-label="Task    categories">
+
+
+                <p class="category-title">CATEGORIES</p>
+
+
+                <button class="category active">
+                    <span>All</span>
+                    <span>8</span>
+                </button>
+
+
+                <button class="category">
+                    <span>Work</span>
+                    <span>3</span>
+                </button>
+
+
+                <button class="category">
+                    <span>Study</span>
+                    <span>3</span>
+                </button>
+
+
+                <button class="category">
+                    <span>Personal</span>
+                    <span>1</span>
+                </button>
+
+
+                <button class="category">
+                    <span>Shopping</span>
+                    <span>1</span>
+                </button>
+
+
+                <button class="category">
+                    <span>Other</span>
+                    <span>0</span>
+                </button>
+
+
+            </nav>
+
+
+            <!-- Overdue Task -->
+                <button class="overdue"> ⚠ 1 overdue task</button>
+
+
+        </aside>
+
+            <button
+                type="button"
+                class="sidebar-overlay"
+                id="sidebar-overlay"
+                aria-label="Close navigation menu"
+                tabindex="-1"
+            ></button>   
+
+
+
+
+        <!-- ===== MAIN CONTENT ===== -->
+        <main>
+
+
+            <!-- ===== HEADER ===== -->
+            <header class="header">
+
+                <!-- Hamburger Menu: visible on mobile -->
+                <button
+                    type="button"
+                    class="menu-toggle"
+                    id="menu-toggle"
+                    aria-label="Open navigation menu"
+                    aria-controls="sidebar"
+                    aria-expanded="false"
+                >
+                    ☰
+                </button>
+
+                <div class="welcome">
+
+
+                    <h1 id="welcome-message">Welcome back! 👋</h1>
+                    <p id="current-date"></p>
+
+
+                </div>
+
+
+                <div class="header-actions">
+
+
+                    <!-- Search -->
+                    <label for="task-search" class="visually-hidden">
+                        Search tasks
+                    </label>
+
+                    <input
+                        type="search"
+                        id="task-search"
+                        placeholder="Search tasks..."
+                        aria-label="Search tasks"
+                    >
+
+
+                    <!-- Notification -->
+                        <button class="notification" type="button"
+                                aria-label="Notifications">
+                            🔔
+                        </button>
+
+
+                    <!-- User Profile -->
+                        <button class="profile" type="button"
+                                aria-label="Open user profile">
+                            JB
+                        </button> 
+
+
+                </div>
+
+
+
+
+            </header>
+
+
+
+
+
+
+            <!-- ===== PAGE CONTENT ===== -->
+            <div class="content">
+
+
+
+
+                <!-- ===== OVERALL PROGRESS ===== -->
+                <section class="progress-card">
+
+
+                    <div class="progress-header">
+
+
+                        <h3>OVERALL PROGRESS</h3>
+                        <span>38%</span>
+
+
+                    </div>
+
+
+                    <div
+                        class="progress-bar"
+                        role="progressbar"
+                        aria-label="Overall task completion"
+                        aria-valuemin="0"
+                        aria-valuemax="100"
+                        aria-valuenow="38"
+                        aria-valuetext="3 of 8 tasks completed"
+                    >
+                        <div class="progress-fill"></div>
+                    </div>
+
+
+                    <p>3 of 8 tasks completed</p>
+
+
+                </section>
+
+
+
+
+                <!-- ===== ADD NEW TASK ===== -->
+                <section class="add-task">
+
+
+                    <h2>ADD NEW TASK</h2>
+                    <div class="add-task-row">
+
+
+                        <div class="task-input">
+
+
+                            <span>＋</span>
+                            <input
+                                type="text"
+                                placeholder="Enter your task..."
+                                aria-label="Enter a new task"
+                            >
+
+
+                        </div>
+
+
+                        <button class="add-button"> ＋ Add Task</button>
+
+
+                    </div>
+
+
+                </section>
+
+
+
+
+
+
+                <!-- ===== SUMMARY CARDS ===== -->
+                <section class="summary">
+
+
+
+
+                    <!-- Total -->
+                    <div class="summary-card">
+
+
+                        <div class="summary-title">
+                            TOTAL TASKS
+                        </div>
+
+
+                        <strong class="blue-number">8</strong>
+
+
+                    </div>
+
+
+
+
+                    <!-- Completed -->
+                    <div class="summary-card">
+
+
+                        <div class="summary-title">
+                            COMPLETED
+                        </div>
+
+
+                        <strong class="green-number">3</strong>
+
+
+                    </div>
+
+
+
+
+                    <!-- Pending -->
+                    <div class="summary-card">
+
+
+                        <div class="summary-title">
+                            PENDING
+                        </div>
+
+
+                        <strong class="yellow-number">5</strong>
+
+
+                    </div>
+
+
+                </section>
+
+
+
+
+
+
+                <!-- ===== TASK LIST ===== -->
+                <section class="tasks">
+
+
+
+
+                    <!-- Tasks Header -->
+                    <div class="tasks-header">
+
+
+                        <h2>Tasks</h2>
+
+
+                        <div class="filters">
+
+
+                            <button class="filter active">
+                                All <span>8</span>
+                            </button>
+
+
+                            <button class="filter">
+                                Pending <span>5</span>
+                            </button>
+
+
+                            <button class="filter">
+                                Completed <span>3</span>
+                            </button>
+
+
+                        </div>
+
+
+                    </div>
+
+
+
+
+
+
+                    <!-- ===== TASK 1 ===== -->
+                    <article class="task">
+
+
+                    <input
+                        type="checkbox"
+                        class="task-checkbox"
+                        aria-label="Mark task as completed: ${task.description}"
+                        ${task.completed ? "checked" : ""}
+                    >
+
+
+                        <div class="task-info">
+
+
+                            <strong>Finish IT Assignment</strong>
+                            <p class="due-date">Sep 14, 2026</p>
+
+
+                        </div>
+
+
+                        <span class="category-badge study">STUDY</span>
+                        <span class="priority-badge high">HIGH</span>
+
+
+                        <div class="task-actions">
+
+                            <!-- user can modify the details to a task that was already created-->
+                            <button type="button" aria-label="Edit Finish IT Assignment">
+                                ✎
+                            </button>
+                            <!-- user can delete the task -->
+                            <button type="button" aria-label="Delete Finish IT Assignment">
+                                🗑
+                            </button>
+
+                            <button type="button" aria-label="Edit Study for Exam">
+                                ✎
+                            </button>
+
+                            <button type="button" aria-label="Delete Study for Exam">
+                                🗑
+                            </button>
+
+                        </div>
+
+
+                    </article>
+
+
+
+
+                    <!-- ===== TASK 2 ===== -->
+                    <article class="task">
+
+                        
+                        <input
+                            type="checkbox"
+                            class="task-checkbox"
+                            aria-label="Mark task as completed: ${task.description}"
+                            ${task.completed ? "checked" : ""}
+                        >
+
+
+
+                        <div class="task-info">
+
+
+                            <strong>Study for Exam</strong>
+                            <p class="due-date">Sep 15, 2026</p>
+
+
+                        </div>
+
+
+                        <span class="category-badge study">STUDY</span>
+                        <span class="priority-badge high">HIGH</span>
+
+
+                        <div class="task-actions">
+
+
+                            <button>✎</button>
+                            <button>🗑</button>
+
+
+                        </div>
+
+
+                    </article>
+               
+                </section>
+
+
+            </div>
+
+
+        </main>
+
+
+    </div>
+
+
+    <script src="function.js"></script>
+
+
+</body>
+</html>
