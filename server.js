@@ -59,13 +59,83 @@ app.get('/api/tasks', (req, res) => {
 // POST /api/tasks
 app.post('/api/tasks', (req, res) => {
     const newTask = req.body;
+
+    // Validate task description
+    if (
+        !newTask ||
+        typeof newTask.description !== 'string' ||
+        newTask.description.trim() === ''
+    ) {
+        return res.status(400).json({
+            message: 'Task description is required.'
+        });
+    }
+
     const currentTasks = readTasksFromFile();
+
     currentTasks.push(newTask);
     saveTasksToFile(currentTasks);
 
     res.status(201).json({
         message: 'Task saved successfully!',
         task: newTask
+    });
+});
+
+
+app.put('/api/tasks/:id', (req, res) => {
+    const taskId = Number(req.params.id);
+    const updatedTask = req.body;
+
+    const currentTasks = readTasksFromFile();
+
+    const taskIndex = currentTasks.findIndex(
+        task => Number(task.id) === taskId
+    );
+
+    if (taskIndex === -1) {
+        return res.status(404).json({
+            message: 'Task not found.'
+        });
+    }
+
+    currentTasks[taskIndex] = {
+        ...currentTasks[taskIndex],
+        ...updatedTask,
+        id: taskId
+    };
+
+    saveTasksToFile(currentTasks);
+
+    res.status(200).json({
+        message: 'Task updated successfully!',
+        task: currentTasks[taskIndex]
+    });
+});
+
+
+// DELETE /api/tasks/:id
+app.delete('/api/tasks/:id', (req, res) => {
+    const taskId = Number(req.params.id);
+
+    const currentTasks = readTasksFromFile();
+
+    const updatedTasks = currentTasks.filter(
+        task => Number(task.id) !== taskId
+    );
+
+    // Check if the task exists
+    if (updatedTasks.length === currentTasks.length) {
+        return res.status(404).json({
+            message: 'Task not found.'
+        });
+    }
+
+    // Save the remaining tasks
+    saveTasksToFile(updatedTasks);
+
+    res.status(200).json({
+        message: 'Task deleted successfully!'
     });
 });
 

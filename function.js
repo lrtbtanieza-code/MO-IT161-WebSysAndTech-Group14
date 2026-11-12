@@ -133,8 +133,8 @@ function saveTasks(tasks) {
 
 // ===============ADD NEW TASK================//
 
-function setupAddTask() {
 
+function setupAddTask() {
     const addButton = document.querySelector(".modal-buttons .add-button");
 
     if (!addButton) {
@@ -144,7 +144,6 @@ function setupAddTask() {
     const quickTask = localStorage.getItem("newTask");
 
     if (quickTask) {
-
         const description = document.getElementById("task-description");
 
         if (description) {
@@ -152,12 +151,9 @@ function setupAddTask() {
         }
 
         localStorage.removeItem("newTask");
-
     }
 
-
-    addButton.addEventListener("click", function () {
-
+    addButton.addEventListener("click", async function () {
         const description = document.getElementById("task-description").value.trim();
         const dueDate = document.getElementById("task-due-date").value;
         const priority = document.getElementById("task-priority").value;
@@ -165,20 +161,12 @@ function setupAddTask() {
         const recurring = document.getElementById("task-recurring").value;
         const reminder = document.getElementById("task-reminder").checked;
 
-       
         if (description === "") {
-
             showMessage("Please enter a task.");
-
             return;
         }
 
-
-
-        const tasks = getTasks();
-
         const newTask = {
-
             id: Date.now(),
             description: description,
             dueDate: dueDate,
@@ -187,45 +175,52 @@ function setupAddTask() {
             recurring: recurring,
             reminder: reminder,
             completed: false
-
         };
 
+        try {
+            const response = await fetch("/api/tasks", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(newTask)
+            });
 
-        
+            if (!response.ok) {
+                throw new Error("Task could not be saved.");
+            }
+
+            const tasks = getTasks();
             tasks.push(newTask);
             saveTasks(tasks);
+
+            showMessage("Task saved successfully!");
+
             window.location.href = "mainPage.html";
 
-
-});
-
+        } catch (error) {
+            console.error("Error saving task:", error);
+            showMessage("Unable to save task. Please try again.");
+        }
+    });
 
     const cancelButton = document.querySelector(".cancel-button");
 
-
     if (cancelButton) {
-
         cancelButton.addEventListener("click", function () {
             window.location.href = "mainPage.html";
-
         });
-
     }
-
 
     const closeButton = document.querySelector(".close-button");
 
-
     if (closeButton) {
-
         closeButton.addEventListener("click", function () {
             window.location.href = "mainPage.html";
-
         });
-
     }
-
 }
+
 
 
 // ===============MAIN PAGE================//
@@ -255,6 +250,7 @@ function setupMainPage() {
 
     createDefaultTasks();
     displayTasks();
+    fetchTasksFromBackend();
     setupMainButtons();
     setupFilters();
     setupCategories();
@@ -647,35 +643,12 @@ function setupMainButtons() {
 
 // ===============COMPLETE TASK================//
 
-function toggleTask(id) {
-    const tasks = getTasks();
 
-    tasks.forEach(function (task) {
-
-        if (task.id === id) {
-
-            task.completed =
-                !task.completed;
-
-        }
-
-    });
-
-
-    saveTasks(tasks);
-    displayTasks();
-
-}
-
-
-// ===============DELETE TASK================//
-
-
-function deleteTask(id) {
+async function toggleTask(id) {
     const tasks = getTasks();
 
     const task = tasks.find(function (task) {
-        return task.id === id;
+        return Number(task.id) === Number(id);
     });
 
     if (!task) {
@@ -683,7 +656,61 @@ function deleteTask(id) {
         return;
     }
 
-    // Create the confirmation dialog.
+    const updatedTask = {
+        ...task,
+        completed: !task.completed
+    };
+
+    try {
+        const response = await fetch(`/api/tasks/${id}`, {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(updatedTask)
+        });
+
+        if (!response.ok) {
+            throw new Error("Unable to update task status.");
+        }
+
+        const updatedTasks = tasks.map(function (item) {
+            return Number(item.id) === Number(id)
+                ? updatedTask
+                : item;
+        });
+
+        saveTasks(updatedTasks);
+        displayTasks();
+
+        showMessage(
+            updatedTask.completed
+                ? "Task marked as completed!"
+                : "Task marked as pending!"
+        );
+
+    } catch (error) {
+        console.error("Error updating task status:", error);
+        showMessage("Unable to update task. Please try again.");
+    }
+}
+
+
+// ===============DELETE TASK================//
+
+
+async function deleteTask(id) {
+    const tasks = getTasks();
+
+    const task = tasks.find(function (task) {
+        return Number(task.id) === Number(id);
+    });
+
+    if (!task) {
+        showMessage("Task not found.");
+        return;
+    }
+
     const overlay = document.createElement("div");
     overlay.className = "edit-dialog-overlay";
 
@@ -709,14 +736,12 @@ function deleteTask(id) {
         </div>
     `;
 
-    // Safely display the task description.
     dialog.querySelector("strong").textContent =
         task.description;
 
     overlay.appendChild(dialog);
     document.body.appendChild(overlay);
 
-    // Close the dialog without deleting.
     function closeDialog() {
         overlay.remove();
     }
@@ -724,23 +749,37 @@ function deleteTask(id) {
     dialog.querySelector("#cancel-delete")
         .addEventListener("click", closeDialog);
 
-    // Delete only after confirmation.
     dialog.querySelector("#confirm-delete")
-        .addEventListener("click", function () {
-            const updatedTasks = getTasks().filter(
-                function (task) {
-                    return task.id !== id;
+        .addEventListener("click", async function () {
+
+            try {
+                const response = await fetch(`/api/tasks/${id}`, {
+                    method: "DELETE"
+                });
+
+                if (!response.ok) {
+                    throw new Error("Unable to delete task from backend.");
                 }
-            );
 
-            saveTasks(updatedTasks);
-            closeDialog();
-            displayTasks();
+                const updatedTasks = getTasks().filter(
+                    function (task) {
+                        return Number(task.id) !== Number(id);
+                    }
+                );
 
-            showMessage("Task deleted successfully!");
+                saveTasks(updatedTasks);
+
+                closeDialog();
+                displayTasks();
+
+                showMessage("Task deleted successfully!");
+
+            } catch (error) {
+                console.error("Error deleting task:", error);
+                showMessage("Unable to delete task. Please try again.");
+            }
         });
 
-    // Close if the user clicks outside the dialog.
     overlay.addEventListener("click", function (event) {
         if (event.target === overlay) {
             closeDialog();
@@ -756,7 +795,9 @@ function deleteTask(id) {
 function editTask(id) {
     console.log("editTask function started. ID:", id);
     const tasks = getTasks();
-    const task = tasks.find(task => task.id === id);
+    const task = tasks.find(
+        task => Number(task.id) === Number(id)
+    );
 
     if (!task) {
         showMessage("Task not found.");
@@ -858,41 +899,64 @@ function editTask(id) {
     });
 
     // Save the updated task
-    dialog.addEventListener("submit", function (event) {
-        event.preventDefault();
+   
+    dialog.addEventListener("submit", async function (event) {
+    event.preventDefault();
 
-        task.description = dialog.querySelector(
-            "#edit-description"
-        ).value.trim();
+    const updatedTask = {
+        ...task,
+        description: dialog.querySelector("#edit-description").value.trim(),
+        dueDate: dialog.querySelector("#edit-due-date").value,
+        priority: dialog.querySelector("#edit-priority").value,
+        category: dialog.querySelector("#edit-category").value,
+        recurring: dialog.querySelector("#edit-recurring").value,
+        reminder: dialog.querySelector("#edit-reminder").checked
+    };
 
-        task.dueDate = dialog.querySelector(
-            "#edit-due-date"
-        ).value;
+    // Check if the task description is empty
+    if (!updatedTask.description) {
+        showMessage("Please enter a task description.");
+        return;
+    }
 
-        task.priority = dialog.querySelector(
-            "#edit-priority"
-        ).value;
+    try {
+        // Send the updated task to the backend
+        const response = await fetch(`/api/tasks/${id}`, {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(updatedTask)
+        });
 
-        task.category = dialog.querySelector(
-            "#edit-category"
-        ).value;
+        if (!response.ok) {
+            throw new Error("Unable to update task in backend.");
+        }
 
-        task.recurring = dialog.querySelector(
-            "#edit-recurring"
-        ).value;
+        // Update the task in localStorage
+        const taskIndex = tasks.findIndex(
+            item => Number(item.id) === Number(id)
+        );
 
-        task.reminder = dialog.querySelector(
-            "#edit-reminder"
-        ).checked;
+        if (taskIndex !== -1) {
+            tasks[taskIndex] = updatedTask;
+        }
 
         saveTasks(tasks);
+
+        // Refresh the dashboard
         closeDialog();
         displayTasks();
 
         showMessage("Task updated successfully!");
-    });
-}
 
+       } catch (error) {
+        console.error("Error updating task:", error);
+        showMessage("Unable to update task. Please try again.");
+    }
+    }); // End of submit event
+
+} // End of editTask()
 
 
 // ===============TASK FILTERS================//
@@ -954,8 +1018,9 @@ function setupFilters() {
             });
 
         });
+}    
 
-}
+
 
 
 // ===============CATEGORIES================//
@@ -1384,37 +1449,35 @@ function setupMobileMenu() {
     });
 }
 // This function asks your new backend for the task list
-async function fetchTasksFromBackend() {
-    try {
-        const response = await fetch('http://localhost:3000/api/tasks');
-        const backendTasks = await response.json();
-        
-        // 1. Translate the backend data to match your frontend's design
-        const formattedTasks = backendTasks.map(task => {
-            return {
-                id: task.id,
-                description: task.title, // Change 'title' to 'description'
-                dueDate: "2026-10-31",   // Give it a default date
-                priority: "high",        // Give it a default priority
-                category: "work",        // Give it a default category
-                recurring: "none",
-                reminder: false,
-                completed: task.status === 'completed'
-            };
-        });
-        
-        // 2. Save the translated tasks so your app can use them
-        saveTasks(formattedTasks);
-        
-        // 3. Tell the page to redraw the tasks on the screen!
-        displayTasks();
-        
-        console.log("SUCCESS! Tasks are formatted and on the screen!");
-        
-    } catch (error) {
-        console.log("Oops, the frontend couldn't connect to the backend:", error);
-    }
-}
 
-// Run the function as soon as the page loads
-fetchTasksFromBackend();
+    async function fetchTasksFromBackend() 
+{
+    try {
+        const response = await fetch("/api/tasks");
+
+        if (!response.ok) {
+            throw new Error("Unable to retrieve tasks.");
+        }
+
+        const backendTasks = await response.json();
+
+        const formattedTasks = backendTasks.map(task => ({
+            ...task,
+            description: task.description || task.title || "",
+            dueDate: task.dueDate || "",
+            priority: task.priority || "medium",
+            category: task.category || "other",
+            recurring: task.recurring || "none",
+            reminder: Boolean(task.reminder),
+            completed: Boolean(task.completed || task.status === "completed")
+        }));
+
+        saveTasks(formattedTasks);
+        displayTasks();
+
+        console.log("Tasks successfully loaded from backend!");
+
+    } catch (error) {
+        console.error("Backend loading error:", error);
+        }
+}

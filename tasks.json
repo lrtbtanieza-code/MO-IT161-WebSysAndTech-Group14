@@ -1,1 +1,73 @@
-[]
+[
+  {
+    "id": 1794409893378,
+    "description": "study",
+    "dueDate": "2026-11-12",
+    "priority": "medium",
+    "category": "other",
+    "recurring": "daily",
+    "reminder": true,
+    "completed": true
+  },
+  {
+    "id": 1794409997435,
+    "description": "metting with client",
+    "dueDate": "2026-11-11",
+    "priority": "medium",
+    "category": "work",
+    "recurring": "monthly",
+    "reminder": true,
+    "completed": true
+  },
+  {
+    "id": 1794410036323,
+    "description": "gym_updated",
+    "dueDate": "2026-11-12",
+    "priority": "high",
+    "category": "personal",
+    "recurring": "weekly",
+    "reminder": true,
+    "completed": false
+  },
+  {
+    "id": 1794410501532,
+    "description": "Family reunion",
+    "dueDate": "2026-11-13",
+    "priority": "high",
+    "category": "personal",
+    "recurring": "monthly",
+    "reminder": true,
+    "completed": false
+  },
+  {
+    "id": 1794416831711,
+    "description": "Edit Synchronization Test updated",
+    "dueDate": "2026-11-12",
+    "priority": "medium",
+    "category": "work",
+    "recurring": "none",
+    "reminder": false,
+    "completed": false
+  },
+  {
+    "id": 1794417281727,
+    "description": "exam",
+    "dueDate": "",
+    "priority": "medium",
+    "category": "other",
+    "recurring": "none",
+    "reminder": false,
+    "completed": false
+  },
+  {
+    "id": 1794417461887,
+    "description": "shopping",
+    "dueDate": "",
+    "priority": "medium",
+    "category": "other",
+    "recurring": "none",
+    "reminder": false,
+    "completed": true
+  }
+  
+]
